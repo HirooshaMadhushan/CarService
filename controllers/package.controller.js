@@ -53,9 +53,31 @@ const updateServicePackage =async (req,res)=>{
 const getAllServicePackages = async(req,res)=>{
 
   try{
-    const package
+    const package = await ServicePackage.findAll();
+    res.status(200).json({
+      message: 'Service packages retrieved successfully',
+      data: package
+    });
+  } catch(error){
+    res.status(500).json({ error: error.message });
+  
+  }
+}
+
+const deleteServicePackage =  async(req,res)=>{
+  const {id}= req.params;
+  try{
+    const packageToDelete = await ServicePackage.findByPk(id);
+
+    if(!packageToDelete){
+      return res.status(404).json({message: 'Service package not found'});
+    }
+    await packageToDelete.destroy();
+    res.status(200).json({message:'Service package deleted successfully'});
+  }catch(error) {
+    res.status(500).json({ error: error.message });
   }
 }
 
 
-module.exports = { createServicePackage,updateServicePackage };
+module.exports = { createServicePackage,updateServicePackage,getAllServicePackages };
