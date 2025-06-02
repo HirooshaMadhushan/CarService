@@ -80,4 +80,4 @@ const deleteServicePackage =  async(req,res)=>{
 }
 
 
-module.exports = { createServicePackage,updateServicePackage,getAllServicePackages };
+module.exports = { createServicePackage,updateServicePackage,getAllServicePackages, deleteServicePackage };
