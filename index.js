@@ -4,8 +4,9 @@ const { connectDB } = require('./config/database');
 const { sequelize } = require('./models');
 const authRoutes = require('./routes/auth.routes');
 const bookingRoutes = require('./routes/booking.routes');
+const packageRoutes = require('./routes/package.routes');
 
-sequelize.sync({ alter: true }); // or { force: true } to reset tables
+sequelize.sync(); // or { force: true } to reset tables
 
 
 const app = express();
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoutes);
 app.use('/api/booking', bookingRoutes);
+app.use('/api/package', packageRoutes);
 
 
 
