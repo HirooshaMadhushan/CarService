@@ -1,41 +1,73 @@
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize, DataTypes } = require("sequelize");
 const { DB_NAME, DB_USER, DB_PASSWORD, DB_HOST } = process.env;
 
+// ================= Database Connection =================
 const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
-  dialect: 'mysql',
-  logging: false
+  dialect: "mysql",
+  logging: false,
 });
 
-// Initialize models
-const User = require('./user.model')(sequelize, DataTypes);
-const ServicePackage = require('./servicePackage.model')(sequelize, DataTypes);
-const Booking = require('./booking.model')(sequelize, DataTypes);
-const MealOption = require('./mealOption.model')(sequelize, DataTypes);
-const Notification = require('./notification.model')(sequelize, DataTypes);
+// ================= Load Existing Models =================
+const User = require("./user.model")(sequelize, DataTypes);
+const ServicePackage = require("./servicePackage.model")(sequelize, DataTypes);
+const Booking = require("./booking.model")(sequelize, DataTypes);
+const Contact = require("./contact.model")(sequelize, DataTypes);
+const Notification = require("./notification.model")(sequelize, DataTypes);
+const ClientMessage = require("./review.model")(sequelize, DataTypes); // ✅ new model
 
-// Associations
-User.hasMany(Booking);
-Booking.belongsTo(User);
+// ================= Load Chat Models =================
+const {
+  ChatSession,
+  ChatMessage,
+  FAQ,
+  ResponseTemplate,
+  AdminAvailability,
+} = require("./chat.model")(sequelize, DataTypes); // ✅ now initialized
 
-ServicePackage.hasMany(Booking);
-Booking.belongsTo(ServicePackage);
+// ================= Associations =================
+// User ↔ Booking
+User.hasMany(Booking, { foreignKey: "userId" });
+Booking.belongsTo(User, { foreignKey: "userId" });
 
-MealOption.hasMany(Booking);
-Booking.belongsTo(MealOption);
+// ServicePackage ↔ Booking
+ServicePackage.hasMany(Booking, { foreignKey: "servicePackageId" });
+Booking.belongsTo(ServicePackage, { foreignKey: "servicePackageId" });
 
-User.hasMany(Notification);
-Notification.belongsTo(User);
+// User ↔ Notification
+User.hasMany(Notification, { foreignKey: "userId" });
+Notification.belongsTo(User, { foreignKey: "userId" });
 
-Booking.hasMany(Notification);
-Notification.belongsTo(Booking);
+// Booking ↔ Notification
+Booking.hasMany(Notification, { foreignKey: "bookingId" });
+Notification.belongsTo(Booking, { foreignKey: "bookingId" });
 
-// Export
+// ChatSession ↔ ChatMessage
+ChatSession.hasMany(ChatMessage, {
+  foreignKey: "sessionId",
+  sourceKey: "sessionId",
+});
+ChatMessage.belongsTo(ChatSession, {
+  foreignKey: "sessionId",
+  targetKey: "sessionId",
+});
+
+// User ↔ AdminAvailability
+User.hasOne(AdminAvailability, { foreignKey: "adminId" });
+AdminAvailability.belongsTo(User, { foreignKey: "adminId" });
+
+// ================= Export All Models =================
 module.exports = {
   sequelize,
   User,
   ServicePackage,
   Booking,
-  MealOption,
-  Notification
+  Contact,
+  Notification,
+  ClientMessage,
+  ChatSession,
+  ChatMessage,
+  FAQ,
+  ResponseTemplate,
+  AdminAvailability,
 };

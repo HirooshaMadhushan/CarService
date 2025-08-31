@@ -5,16 +5,29 @@ module.exports = (sequelize, DataTypes) => {
     serviceDate: DataTypes.DATEONLY,
     timeSlot: DataTypes.STRING,
     mealOption: DataTypes.ENUM('breakfast', 'lunch', 'none'),
+
+    // New fields for meal details directly in Booking
+    mealItemName: DataTypes.STRING,     // e.g. "Pancakes"
+    mealQuantity: DataTypes.INTEGER,    // e.g. 2
+
     status: {
       type: DataTypes.ENUM('booked', 'in-progress', 'completed', 'cancelled'),
       defaultValue: 'booked'
     },
-    notificationStatus: DataTypes.STRING
+    notificationStatus: DataTypes.STRING,
+
+    // ✅ New column
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        isEmail: true,
+      },
+    },
   });
 
   Booking.associate = (models) => {
     Booking.belongsTo(models.User, { foreignKey: 'userId' });
-    Booking.hasMany(models.MealItem, { foreignKey: 'bookingId' }); // associate meals
   };
 
   return Booking;

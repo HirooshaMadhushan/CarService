@@ -79,5 +79,25 @@ const deleteServicePackage =  async(req,res)=>{
   }
 }
 
+const getServicePackageById = async (req, res) => {
+  const { id } = req.params;
 
-module.exports = { createServicePackage,updateServicePackage,getAllServicePackages, deleteServicePackage };
+  try {
+    const servicePackage = await ServicePackage.findByPk(id);
+
+    if (!servicePackage) {
+      return res.status(404).json({ message: 'Service package not found' });
+    }
+
+    res.status(200).json({
+      message: 'Service package retrieved successfully',
+      data: servicePackage
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+module.exports = { createServicePackage,updateServicePackage,getAllServicePackages, deleteServicePackage,getServicePackageById };
